@@ -5,48 +5,41 @@ using namespace std;
   
 int pageFaults(int pages[], int n, int capacity)
 {
-    unordered_set<int> s;
-  
-    unordered_map<int, int> indexes;
-  
+    unordered_set<int> mem;
+    unordered_map<int, int> history;
   
     int page_faults = 0;
     for (int i=0; i<n; i++)
     {
-  
-        if (s.size() < capacity)
+        if (mem.size() < capacity)
         {
-            if (s.find(pages[i])==s.end())
+            if (mem.find(pages[i])==mem.end())
             {
-                s.insert(pages[i]);
+                mem.insert(pages[i]);
                 page_faults++;
             }
-  
-            indexes[pages[i]] = i;
+            history[pages[i]] = i;
         }
   
         else
         {
-            if (s.find(pages[i]) == s.end())
+            if(mem.find(pages[i])==mem.end())
             {
-                int lru = INT_MAX, val;
-                for (auto it=s.begin(); it!=s.end(); it++)
+                int lruPage=-1, lastUsedIdx=INT_MAX;
+                unordered_set<int>::iterator itr;
+                for(itr=mem.begin(); itr!=mem.end(); ++itr)
                 {
-                    if (indexes[*it] < lru)
+                    if(history[*itr]<lastUsedIdx)
                     {
-                        lru = indexes[*it];
-                        val = *it;
+                        lastUsedIdx=history[*itr];
+                        lruPage=*itr;
                     }
                 }
-  
-                s.erase(val);
-  
-                s.insert(pages[i]);
-  
-                page_faults++;
+                mem.erase(lruPage);
+                mem.insert(pages[i]);
+                ++page_faults;
             }
-  
-            indexes[pages[i]] = i;
+            history[pages[i]]=i;
         }
     }
   
@@ -58,6 +51,6 @@ int main()
     int pages[] = {7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 2};
     int n = sizeof(pages)/sizeof(pages[0]);
     int capacity = 4;
-    cout << pageFaults(pages, n, capacity);
+    cout <<"\nTotal page faults using LRU: "<<pageFaults(pages, n, capacity)<<"\n";
     return 0;
 }

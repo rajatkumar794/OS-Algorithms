@@ -5,7 +5,6 @@ using namespace std;
 void firstFit(vector<int> blockSize, int m, vector<int> processSize, int n)
 {
     vector<int> allocation(n,-1);
-  
     for (int i = 0; i < n; i++)
     {
         for (int j = 0; j < m; j++)
@@ -18,7 +17,7 @@ void firstFit(vector<int> blockSize, int m, vector<int> processSize, int n)
             }
         }
     }
-  
+    
     cout << "\nProcess No.\tProcess Size\tBlock no.\n";
     for (int i = 0; i < n; i++)
     {

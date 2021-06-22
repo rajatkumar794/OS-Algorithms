@@ -3,20 +3,17 @@
 using namespace std;
   
 
-void findWaitingTime(int processes[], int n,
-             int bt[], vector<int> &wt, int quantum)
+void findWaitingTime(vector<vector<int>> processes, int n, vector<int> &wt, int quantum)
 {
     vector<int> rem_bt(n);
     for (int i = 0 ; i < n ; i++)
-        rem_bt[i] =  bt[i];
+        rem_bt[i] =  processes[i][2];
   
     int t = 0; 
-  
     while (1)
     {
         bool done = true;
   
-
         for (int i = 0 ; i < n; i++)
         {
             if (rem_bt[i] > 0)
@@ -34,7 +31,7 @@ void findWaitingTime(int processes[], int n,
                 {
                     t = t + rem_bt[i];
   
-                    wt[i] = t - bt[i];
+                    wt[i] = t - processes[i][2];
   
                     rem_bt[i] = 0;
                 }
@@ -47,23 +44,21 @@ void findWaitingTime(int processes[], int n,
 }
   
 
-void findTurnAroundTime(int processes[], int n,
-                        int bt[], vector<int> wt, vector<int> &tat)
+void findTurnAroundTime(vector<vector<int>> processes, int n, vector<int> wt, vector<int> &tat)
 {
-    for (int i = 0; i < n ; i++)
-        tat[i] = bt[i] + wt[i];
+    for(int i = 0; i < n ; i++)
+        tat[i] = processes[i][2] + wt[i];
 }
   
 
-void findavgTime(int processes[], int n, int bt[],
-                                     int quantum)
+void findavgTime(vector<vector<int>> processes, int n, int quantum)
 {
     vector<int> wt(n), tat(n);
     int total_wt = 0, total_tat = 0;
   
-    findWaitingTime(processes, n, bt, wt, quantum);
+    findWaitingTime(processes, n, wt, quantum);
   
-    findTurnAroundTime(processes, n, bt, wt, tat);
+    findTurnAroundTime(processes, n, wt, tat);
   
     cout << "Processes "<< " Burst time "
          << " Waiting time " << " Turn around time\n";
@@ -72,7 +67,7 @@ void findavgTime(int processes[], int n, int bt[],
     {
         total_wt = total_wt + wt[i];
         total_tat = total_tat + tat[i];
-        cout << " " << i+1 << "\t\t" << bt[i] <<"\t "
+        cout << " " << i+1 << "\t\t" << processes[i][2] <<"\t "
              << wt[i] <<"\t\t " << tat[i] <<endl;
     }
   
@@ -84,12 +79,9 @@ void findavgTime(int processes[], int n, int bt[],
   
 int main()
 {
-    int processes[] = { 1, 2, 3};
-    int n = sizeof processes / sizeof processes[0];
-  
-    int burst_time[] = {10, 5, 8};
-  
+    vector<vector<int>> processes = {{1, 0, 6}, {2, 2, 4}, {3, 3, 8}, {4, 5, 3}};
+    int n = processes.size();  
     int quantum = 2;
-    findavgTime(processes, n, burst_time, quantum);
+    findavgTime(processes, n, quantum);
     return 0;
 }

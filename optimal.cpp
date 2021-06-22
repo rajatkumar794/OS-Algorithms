@@ -1,62 +1,52 @@
 #include<iostream>
-#include<vector>
+#include<unordered_set>
 using namespace std;
   
-
-bool search(int key, vector<int> &fr)
-{
-    for (int i = 0; i < fr.size(); i++)
-        if (fr[i] == key)
-            return true;
-    return false;
-}
-  
-
-int predict(int pg[], vector<int>& fr, int pn, int index)
+int predict(int pages[], unordered_set<int> mem, int n, int index)
 {
     int res = -1, farthest = index;
-    for (int i = 0; i < fr.size(); i++) {
+    unordered_set<int>::iterator itr;
+    for(itr=mem.begin(); itr!=mem.end(); ++itr)
+    {
         int j;
-        for (j = index; j < pn; j++) {
-            if (fr[i] == pg[j]) {
-                if (j > farthest) {
+        for (j = index; j < n; j++)
+        {
+            if (*itr == pages[j])
+            {
+                if (j > farthest)
+                {
                     farthest = j;
-                    res = i;
+                    res = *itr;
                 }
                 break;
             }
         }
-  
-        if (j == pn)
-            return i;
+        if(j==n)
+            return *itr;
     }
-  
-    return (res == -1) ? 0 : res;
+    return res;
 }
   
-void optimalPage(int pg[], int pn, int fn)
+void optimalPage(int pages[], int pn, int capacity)
 {
-    vector<int> fr;
-    int hit = 0;
-    for (int i = 0; i < pn; i++) {
-  
-
-        if (search(pg[i], fr)) {
-            hit++;
+    unordered_set<int> mem;
+    int page_faults = 0;
+    for (int i = 0; i < pn; i++)
+    {
+        if (mem.find(pages[i])!=mem.end())
             continue;
-        }
-  
-        if (fr.size() < fn)
-            fr.push_back(pg[i]);
-  
 
-        else {
-            int j = predict(pg, fr, pn, i + 1);
-            fr[j] = pg[i];
+        ++page_faults;
+        if (mem.size() < capacity)
+            mem.insert(pages[i]);
+        else
+        {
+            int lastUsedPage = predict(pages, mem, pn, i + 1);
+            mem.erase(lastUsedPage);
+            mem.insert(pages[i]);
         }
     }
-    cout << "No. of hits = " << hit << endl;
-    cout << "No. of misses = " << pn - hit << endl;
+    cout << "\nTotal Page Faults using Optimal = " << page_faults << endl;
 }
   
 
@@ -64,7 +54,7 @@ int main()
 {
     int pg[] = { 7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 2 };
     int pn = sizeof(pg) / sizeof(pg[0]);
-    int fn = 4;
-    optimalPage(pg, pn, fn);
+    int capacity = 4;
+    optimalPage(pg, pn, capacity);
     return 0;
 }
